@@ -4,7 +4,7 @@
   <name>stm32_drone_control</name>
   <version>0.1.0</version>
   <description>ROS 2 bridge and visualization package for STM32 H7 MPU6050 drone controller</description>
-  <maintainer email="emirhan@todo.todo">emirhan</maintainer>
+  <maintainer email="emirhanozdemir2045@gmail.com">emirhan</maintainer>
   <license>MIT</license>
 
   <depend>rclpy</depend>
