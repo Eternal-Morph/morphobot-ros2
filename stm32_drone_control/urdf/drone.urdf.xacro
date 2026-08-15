@@ -1,12 +1,11 @@
 <?xml version="1.0"?>
 <robot name="stm32_drone" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <!-- Base Link (Robotun Kök Linki - Gazebo HIL Simülasyonu İçin Temiz Yapı) -->
+  <!-- Base Link -->
   <link name="base_link">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <!-- STL metre cinsindedir (0.52m x 0.52m) -->
         <mesh filename="package://stm32_drone_control/meshes/iris.stl" scale="1 1 1"/>
       </geometry>
       <material name="dark_gray">
@@ -17,7 +16,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://stm32_drone_control/meshes/iris.stl" scale="1 1 1"/>
+        <box size="0.15 0.15 0.11"/>
       </geometry>
     </collision>
 
@@ -28,23 +27,19 @@
     </inertial>
   </link>
 
-  <!-- Rotor 0 Linki (Tüm fiziksel özellikler ana URDF yapısında) -->
+  <!-- ROTOR 0 -->
   <link name="rotor_0">
     <inertial>
-      <!-- Kütle Merkezi -->
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <mass value="0.005"/>
       <inertia ixx="9.75e-07" ixy="0" ixz="0" iyy="0.000273104" iyz="0" izz="0.000274004"/>
     </inertial>
-
     <visual>
-      <!-- X veya Y ekseninde 90 derece döndürerek yere paralel hale getiriyoruz -->
       <origin xyz="0 0 0" rpy="1.5708 0 0"/> 
       <geometry>
         <mesh filename="package://stm32_drone_control/meshes/iris_prop_ccw.dae" scale="1 1 1"/>
       </geometry>
     </visual>
-
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
@@ -53,24 +48,31 @@
     </collision>
   </link>
 
-  <!-- ===================================================================== -->
-  <!--                               ROTOR 1                                 -->
-  <!-- ===================================================================== -->
+  <joint name="rotor_0_joint" type="continuous">
+    <origin xyz="0.13 -0.22 0.023" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="rotor_0"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="100" velocity="100"/>
+  </joint>
+
+  <gazebo reference="rotor_0">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+  <!-- ROTOR 1 -->
   <link name="rotor_1">
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <mass value="0.005"/>
       <inertia ixx="9.75e-07" ixy="0" ixz="0" iyy="0.000273104" iyz="0" izz="0.000274004"/>
     </inertial>
-    
     <visual>
-      <!-- Pervaneyi yere paralel hale getiren 90 derece (1.5708 radyan) rotasyon -->
       <origin xyz="0 0 0" rpy="1.5708 0 0"/>
       <geometry>
         <mesh filename="package://stm32_drone_control/meshes/iris_prop_ccw.dae" scale="1 1 1"/>
       </geometry>
     </visual>
-    
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
@@ -79,38 +81,31 @@
     </collision>
   </link>
 
-  <joint name="rotor_1_joint" type="revolute">
+  <joint name="rotor_1_joint" type="continuous">
     <origin xyz="-0.13 0.2 0.023" rpy="0 0 0"/>
     <parent link="base_link"/>
     <child link="rotor_1"/>
     <axis xyz="0 0 1"/>
-    <limit lower="-1e+16" upper="1e+16" effort="0" velocity="0"/>
+    <limit effort="100" velocity="100"/>
   </joint>
 
-  <!-- Gazebo Özel Renk Ataması -->
   <gazebo reference="rotor_1">
     <material>Gazebo/DarkGrey</material>
   </gazebo>
 
-
-  <!-- ===================================================================== -->
-  <!--                               ROTOR 2                                 -->
-  <!-- ===================================================================== -->
+  <!-- ROTOR 2 -->
   <link name="rotor_2">
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <mass value="0.005"/>
       <inertia ixx="9.75e-07" ixy="0" ixz="0" iyy="0.000273104" iyz="0" izz="0.000274004"/>
     </inertial>
-    
     <visual>
-      <!-- Pervaneyi yere paralel hale getiren rotasyon -->
       <origin xyz="0 0 0" rpy="1.5708 0 0"/>
       <geometry>
         <mesh filename="package://stm32_drone_control/meshes/iris_prop_cw.dae" scale="1 1 1"/>
       </geometry>
     </visual>
-    
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
@@ -119,38 +114,31 @@
     </collision>
   </link>
 
-  <joint name="rotor_2_joint" type="revolute">
+  <joint name="rotor_2_joint" type="continuous">
     <origin xyz="0.13 0.22 0.023" rpy="0 0 0"/>
     <parent link="base_link"/>
     <child link="rotor_2"/>
     <axis xyz="0 0 1"/>
-    <limit lower="-1e+16" upper="1e+16" effort="0" velocity="0"/>
+    <limit effort="100" velocity="100"/>
   </joint>
 
-  <!-- Gazebo Özel Renk Ataması -->
   <gazebo reference="rotor_2">
     <material>Gazebo/Blue</material>
   </gazebo>
 
-
-  <!-- ===================================================================== -->
-  <!--                               ROTOR 3                                 -->
-  <!-- ===================================================================== -->
+  <!-- ROTOR 3 -->
   <link name="rotor_3">
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <mass value="0.005"/>
       <inertia ixx="9.75e-07" ixy="0" ixz="0" iyy="0.000273104" iyz="0" izz="0.000274004"/>
     </inertial>
-    
     <visual>
-      <!-- Pervaneyi yere paralel hale getiren rotasyon -->
       <origin xyz="0 0 0" rpy="1.5708 0 0"/>
       <geometry>
         <mesh filename="package://stm32_drone_control/meshes/iris_prop_cw.dae" scale="1 1 1"/>
       </geometry>
     </visual>
-    
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
@@ -159,34 +147,17 @@
     </collision>
   </link>
 
-  <joint name="rotor_3_joint" type="revolute">
+  <joint name="rotor_3_joint" type="continuous">
     <origin xyz="-0.13 -0.2 0.023" rpy="0 0 0"/>
     <parent link="base_link"/>
     <child link="rotor_3"/>
     <axis xyz="0 0 1"/>
-    <limit lower="-1e+16" upper="1e+16" effort="0" velocity="0"/>
+    <limit effort="100" velocity="100"/>
   </joint>
 
-  <!-- Gazebo Özel Renk Ataması -->
   <gazebo reference="rotor_3">
     <material>Gazebo/DarkGrey</material>
   </gazebo>
-
-  <!-- Pervane Eklemi -->
-  <joint name="rotor_0_joint" type="revolute">
-    <origin xyz="0.13 -0.22 0.023" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="rotor_0"/>
-    <axis xyz="0 0 1"/>
-    <!-- Pervane olduğu için limitleri geniş tutuyoruz, dilersek type="continuous" da yapabiliriz -->
-    <limit lower="-1e+16" upper="1e+16" effort="0" velocity="0"/>
-  </joint>
-
-  <!-- Sadece Gazebo'ya özel renk ataması -->
-  <gazebo reference="rotor_0">
-    <material>Gazebo/Blue</material>
-  </gazebo>
-
 
   <!-- IMU Sensor Link -->
   <joint name="imu_joint" type="fixed">
@@ -197,9 +168,9 @@
 
   <link name="imu_link"/>
 
-  <!-- Gazebo HIL Ayarları: Kinematik / Statik Mod (Fizik motoru pose komutlarını engellemez) -->
+  <!-- Gazebo Ayarları -->
   <gazebo>
-    <static>true</static>
+    <static>false</static>
   </gazebo>
 
   <gazebo reference="base_link">
@@ -218,6 +189,81 @@
       <visualize>true</visualize>
       <topic>imu/sim_data</topic>
     </sensor>
+  </gazebo>
+
+  <!-- Multicopter Aerodinamik Eklentileri -->
+  <gazebo>
+    <plugin filename="libgz-sim-multicopter-motor-model-system.so" name="gz::sim::systems::MulticopterMotorModel">
+      <robotNamespace>stm32_drone</robotNamespace>
+      <jointName>rotor_0_joint</jointName>
+      <linkName>rotor_0</linkName>
+      <turningDirection>ccw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>8.54858e-06</motorConstant>
+      <momentConstant>0.06</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>0</motorNumber>
+      <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <motorType>velocity</motorType>
+    </plugin>
+
+    <plugin filename="libgz-sim-multicopter-motor-model-system.so" name="gz::sim::systems::MulticopterMotorModel">
+      <robotNamespace>stm32_drone</robotNamespace>
+      <jointName>rotor_1_joint</jointName>
+      <linkName>rotor_1</linkName>
+      <turningDirection>ccw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>8.54858e-06</motorConstant>
+      <momentConstant>0.06</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>1</motorNumber>
+      <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <motorType>velocity</motorType>
+    </plugin>
+
+    <plugin filename="libgz-sim-multicopter-motor-model-system.so" name="gz::sim::systems::MulticopterMotorModel">
+      <robotNamespace>stm32_drone</robotNamespace>
+      <jointName>rotor_2_joint</jointName>
+      <linkName>rotor_2</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>8.54858e-06</motorConstant>
+      <momentConstant>0.06</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>2</motorNumber>
+      <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <motorType>velocity</motorType>
+    </plugin>
+
+    <plugin filename="libgz-sim-multicopter-motor-model-system.so" name="gz::sim::systems::MulticopterMotorModel">
+      <robotNamespace>stm32_drone</robotNamespace>
+      <jointName>rotor_3_joint</jointName>
+      <linkName>rotor_3</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>8.54858e-06</motorConstant>
+      <momentConstant>0.06</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>3</motorNumber>
+      <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <motorType>velocity</motorType>
+    </plugin>
   </gazebo>
 
 </robot>

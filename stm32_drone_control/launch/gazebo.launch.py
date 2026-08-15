@@ -62,6 +62,9 @@ def generate_launch_description():
         arguments=[
             '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
             '/world/empty/set_pose@ros_gz_interfaces/srv/SetEntityPose@gz.msgs.Pose@gz.msgs.Boolean',
+
+            '/stm32_drone/command/motor_speed@actuator_msgs/msg/Actuators]gz.msgs.Actuators',
+            
         ],
         output='screen'
     )
