@@ -29,6 +29,8 @@ setup(
             'serial_imu_bridge = stm32_drone_control.serial_imu_bridge:main',
             'pid_tuner_node = stm32_drone_control.pid_tuner_node:main',
             'real_to_sim_bridge = stm32_drone_control.real_to_sim_bridge:main',
+            'hil_gamepad_stm_bridge = stm32_drone_control.hil_gamepad_stm_bridge:main',
+            'stm32_hil_bridge = stm32_drone_control.stm32_hil_bridge:main',
         ],
     },
 )
