@@ -1,0 +1,4 @@
+source;share/eternalmorph_description/local_setup.bash
+source;share/eternalmorph_description/local_setup.dsv
+source;share/eternalmorph_description/local_setup.sh
+source;share/eternalmorph_description/local_setup.zsh

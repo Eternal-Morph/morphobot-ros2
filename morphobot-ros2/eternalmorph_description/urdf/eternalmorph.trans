@@ -1,0 +1,136 @@
+<?xml version="1.0" ?>
+<robot name="eternalmorph" xmlns:xacro="http://www.ros.org/wiki/xacro" >
+
+<transmission name="sol_on_ground_mode_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="sol_on_ground_mode">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="sol_on_ground_mode_actr">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<transmission name="sol_on_air_mode_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="sol_on_air_mode">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="sol_on_air_mode_actr">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<transmission name="sag_on_ground_mode_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="sag_on_ground_mode">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="sag_on_ground_mode_actr">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<transmission name="sag_on_air_mode_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="sag_on_air_mode">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="sag_on_air_mode_actr">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<transmission name="sol_arka_ground_mode_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="sol_arka_ground_mode">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="sol_arka_ground_mode_actr">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<transmission name="sol_arka_air_mode_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="sol_arka_air_mode">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="sol_arka_air_mode_actr">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<transmission name="sag_arka_ground_mode_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="sag_arka_ground_mode">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="sag_arka_ground_mode_actr">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<transmission name="sag_arka_air_mode_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="sag_arka_air_mode">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="sag_arka_air_mode_actr">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<transmission name="sol_on_teker_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="sol_on_teker">
+    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="sol_on_teker_actr">
+    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<transmission name="sol_arka_teker_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="sol_arka_teker">
+    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="sol_arka_teker_actr">
+    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<transmission name="sag_on_teker_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="sag_on_teker">
+    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="sag_on_teker_actr">
+    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<transmission name="sag_arka_teker_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="sag_arka_teker">
+    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="sag_arka_teker_actr">
+    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+</robot>
