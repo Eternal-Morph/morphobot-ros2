@@ -346,4 +346,28 @@
   <selfCollide>false</selfCollide>
 </gazebo>
 
+<gazebo reference="camera_1">
+  <material>${body_color}</material>
+  <sensor name="camera" type="camera">
+    <pose>0 0.025 0.02 0 0 1.5707963</pose>
+    <visualize>true</visualize>
+    <update_rate>30.0</update_rate>
+    <topic>/camera/image_raw</topic>
+    <camera>
+      <camera_info_topic>/camera/camera_info</camera_info_topic>
+      <optical_frame_id>camera_1_optical_frame</optical_frame_id>
+      <horizontal_fov>1.3962634</horizontal_fov>
+      <image>
+        <width>640</width>
+        <height>480</height>
+        <format>R8G8B8</format>
+      </image>
+      <clip>
+        <near>0.02</near>
+        <far>300</far>
+      </clip>
+    </camera>
+  </sensor>
+</gazebo>
+
 </robot>

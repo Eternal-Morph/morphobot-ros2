@@ -637,4 +637,40 @@
   <dynamics damping="2.0" friction="0.2"/>
 </joint>
 
+<link name="camera_1">
+    <inertial>
+      <origin xyz="7.9669377317515e-08 0.007701579533281336 0.019385691102944518" rpy="0 0 0"/>
+      <mass value="0.0441171047069775"/>
+      <inertia ixx="6e-06" iyy="5e-06" izz="5e-06" ixy="0.0" iyz="0.0" ixz="-0.0"/>
+    </inertial>
+    <visual>
+      <origin xyz="-0.42 -0.1 -0.01" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://eternalmorph_description/meshes/camera_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.42 -0.1 -0.01" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://eternalmorph_description/meshes/camera_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="camera_joint" type="fixed">
+    <origin xyz="0.42 0.1 0.01" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="camera_1"/>
+  </joint>
+
+  <!-- Optical frame for ROS camera conventions (Z forward, X right, Y down) -->
+  <link name="camera_1_optical_frame"/>
+
+  <joint name="camera_1_optical_joint" type="fixed">
+    <origin xyz="0 0.025 0.02" rpy="-1.5707963 0 0"/>
+    <parent link="camera_1"/>
+    <child link="camera_1_optical_frame"/>
+  </joint>
+
 </robot>

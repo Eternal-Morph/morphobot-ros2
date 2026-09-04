@@ -6,6 +6,7 @@ import math
 import json
 import rclpy
 from rclpy.node import Node
+from rclpy.parameter import Parameter
 from std_msgs.msg import Float64
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Twist
@@ -14,7 +15,10 @@ STATE_FILE = '/tmp/eternalmorph_state.json'
 
 class ModeControllerNode(Node):
     def __init__(self, requested_mode=None, transition_time=3.0):
-        super().__init__('mode_controller_node')
+        super().__init__(
+            'mode_controller_node',
+            parameter_overrides=[Parameter('use_sim_time', Parameter.Type.BOOL, True)]
+        )
         
         self.declare_parameter('mode', 'default_mode')
         self.declare_parameter('transition_time', transition_time)
@@ -112,7 +116,8 @@ class ModeControllerNode(Node):
 
         # Başlangıç pozisyonlarını belirle
         start_targets = {}
-        received_all = all(j in self.current_joint_states for j in self.joints)
+        self.gazebo_active = all(j in self.current_joint_states for j in self.joints)
+        received_all = self.gazebo_active
 
         if received_all:
             for j in self.joints:
@@ -213,7 +218,8 @@ class ModeControllerNode(Node):
             js_msg.position = [float(current_positions[j]) for j in js_msg.name]
 
             self.js_cmd_pub.publish(js_msg)
-            self.js_direct_pub.publish(js_msg)
+            if not self.gazebo_active:
+                self.js_direct_pub.publish(js_msg)
 
             if progress >= 1.0:
                 break

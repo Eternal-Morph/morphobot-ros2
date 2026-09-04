@@ -4,12 +4,16 @@ import time
 import math
 import rclpy
 from rclpy.node import Node
+from rclpy.parameter import Parameter
 from std_msgs.msg import Float64
 from sensor_msgs.msg import JointState
 
 class ArmFolderNode(Node):
     def __init__(self, mode, fold_time=3.0):
-        super().__init__('arm_folder_node')
+        super().__init__(
+            'arm_folder_node',
+            parameter_overrides=[Parameter('use_sim_time', Parameter.Type.BOOL, True)]
+        )
         self.mode = mode
         self.fold_time = fold_time
 
