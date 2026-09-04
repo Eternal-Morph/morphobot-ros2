@@ -372,19 +372,19 @@
 
 <link name="sol_on_pervane_1">
   <inertial>
-    <origin xyz="-0.0027102891123487183 -3.060681447453195e-07 2.643057327444964e-07" rpy="0 0 0"/>
+    <origin xyz="2.6430573e-07 -3.0606814e-07 0.0027102891" rpy="0 1.57079632679 0"/>
     <mass value="0.027453359988130525"/>
     <inertia ixx="1.0e-05" iyy="1e-05" izz="1e-05" ixy="-0.0" iyz="-0.0" ixz="-0.0"/>
   </inertial>
   <visual>
-    <origin xyz="-0.274181 -0.244976 -0.019994" rpy="0 0 0"/>
+    <origin xyz="-0.019994 -0.244976 0.274181" rpy="0 1.57079632679 0"/>
     <geometry>
       <mesh filename="package://eternalmorph_description/meshes/sol_on_pervane_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
-    <origin xyz="-0.274181 -0.244976 -0.019994" rpy="0 0 0"/>
+    <origin xyz="-0.019994 -0.244976 0.274181" rpy="0 1.57079632679 0"/>
     <geometry>
       <mesh filename="package://eternalmorph_description/meshes/sol_on_pervane_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -393,19 +393,19 @@
 
 <link name="sol_arka_pervane_1">
   <inertial>
-    <origin xyz="-0.0027102891123494954 5.542049622553336e-07 -1.1353977304173757e-07" rpy="0 0 0"/>
+    <origin xyz="-1.1353977e-07 5.5420496e-07 0.0027102891" rpy="0 1.57079632679 0"/>
     <mass value="0.027453359988130525"/>
     <inertia ixx="1.0e-05" iyy="1e-05" izz="1e-05" ixy="-0.0" iyz="-0.0" ixz="-0.0"/>
   </inertial>
   <visual>
-    <origin xyz="-0.274181 0.374976 -0.019614" rpy="0 0 0"/>
+    <origin xyz="-0.019614 0.374976 0.274181" rpy="0 1.57079632679 0"/>
     <geometry>
       <mesh filename="package://eternalmorph_description/meshes/sol_arka_pervane_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
-    <origin xyz="-0.274181 0.374976 -0.019614" rpy="0 0 0"/>
+    <origin xyz="-0.019614 0.374976 0.274181" rpy="0 1.57079632679 0"/>
     <geometry>
       <mesh filename="package://eternalmorph_description/meshes/sol_arka_pervane_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -414,19 +414,19 @@
 
 <link name="sag_arka_pervane_1">
   <inertial>
-    <origin xyz="0.0027102891123486073 -3.04781677812338e-07 1.4261012662442063e-07" rpy="0 0 0"/>
+    <origin xyz="-1.4261013e-07 -3.0478168e-07 0.0027102891" rpy="0 -1.57079632679 0"/>
     <mass value="0.027453359988130525"/>
     <inertia ixx="1.0e-05" iyy="1e-05" izz="1e-05" ixy="0.0" iyz="0.0" ixz="-0.0"/>
   </inertial>
   <visual>
-    <origin xyz="-0.565819 -0.244976 -0.020398" rpy="0 0 0"/>
+    <origin xyz="0.020398 -0.244976 -0.565819" rpy="0 -1.57079632679 0"/>
     <geometry>
       <mesh filename="package://eternalmorph_description/meshes/sag_arka_pervane_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
-    <origin xyz="-0.565819 -0.244976 -0.020398" rpy="0 0 0"/>
+    <origin xyz="0.020398 -0.244976 -0.565819" rpy="0 -1.57079632679 0"/>
     <geometry>
       <mesh filename="package://eternalmorph_description/meshes/sag_arka_pervane_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -435,19 +435,19 @@
 
 <link name="sag_on_pervane_1">
   <inertial>
-    <origin xyz="0.0026102891123487293 3.06068145106142e-07 6.712215920232079e-07" rpy="0 0 0"/>
+    <origin xyz="-6.7122159e-07 3.0606815e-07 0.0026102891" rpy="0 -1.57079632679 0"/>
     <mass value="0.027453359988130525"/>
     <inertia ixx="1.0e-05" iyy="1e-05" izz="1e-05" ixy="-0.0" iyz="0.0" ixz="0.0"/>
   </inertial>
   <visual>
-    <origin xyz="-0.565819 0.374976 -0.020386" rpy="0 0 0"/>
+    <origin xyz="0.020386 0.374976 -0.565819" rpy="0 -1.57079632679 0"/>
     <geometry>
       <mesh filename="package://eternalmorph_description/meshes/sag_on_pervane_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
-    <origin xyz="-0.565819 0.374976 -0.020386" rpy="0 0 0"/>
+    <origin xyz="0.020386 0.374976 -0.565819" rpy="0 -1.57079632679 0"/>
     <geometry>
       <mesh filename="package://eternalmorph_description/meshes/sag_on_pervane_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -532,31 +532,31 @@
 </joint>
 
 <joint name="sol_on_pervane_joint" type="continuous">
-  <origin xyz="-0.019 0.0 0.0" rpy="0 0 0"/>
+  <origin xyz="-0.019 0.0 0.0" rpy="0 -1.57079632679 0"/>
   <parent link="sol_on_teker_1"/>
   <child link="sol_on_pervane_1"/>
-  <axis xyz="-1.0 0.0 0.0"/>
+  <axis xyz="0.0 0.0 1.0"/>
 </joint>
 
 <joint name="sol_arka_pervane_joint" type="continuous">
-  <origin xyz="-0.019 0.0 -0.000392" rpy="0 0 0"/>
+  <origin xyz="-0.019 0.0 -0.000392" rpy="0 -1.57079632679 0"/>
   <parent link="sol_arka_teker_1"/>
   <child link="sol_arka_pervane_1"/>
-  <axis xyz="-1.0 0.0 0.0"/>
+  <axis xyz="0.0 0.0 1.0"/>
 </joint>
 
 <joint name="sag_on_pervane_joint" type="continuous">
-  <origin xyz="0.019 0.0 0.000392" rpy="0 0 0"/>
+  <origin xyz="0.019 0.0 0.000392" rpy="0 1.57079632679 0"/>
   <parent link="sag_on_teker_1"/>
   <child link="sag_on_pervane_1"/>
-  <axis xyz="1.0 0.0 0.0"/>
+  <axis xyz="0.0 0.0 1.0"/>
 </joint>
 
 <joint name="sag_arka_pervane_joint" type="continuous">
-  <origin xyz="0.019 0.0 0.000392" rpy="0 0 0"/>
+  <origin xyz="0.019 0.0 0.000392" rpy="0 1.57079632679 0"/>
   <parent link="sag_arka_teker_1"/>
   <child link="sag_arka_pervane_1"/>
-  <axis xyz="1.0 0.0 0.0"/>
+  <axis xyz="0.0 0.0 1.0"/>
 </joint>
 
 <joint name="bacak_fixed_joint" type="fixed">

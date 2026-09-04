@@ -111,7 +111,7 @@
     <timeConstantDown>0.025</timeConstantDown>
     <maxRotVelocity>2000.0</maxRotVelocity>
     <motorConstant>2.0e-05</motorConstant>
-    <momentConstant>0.016</momentConstant>
+    <momentConstant>0.0</momentConstant>
     <commandSubTopic>command/motor_speed</commandSubTopic>
     <actuator_number>0</actuator_number>
     <motorNumber>0</motorNumber>
@@ -125,12 +125,12 @@
     <robotNamespace>eternalmorph</robotNamespace>
     <jointName>sol_arka_pervane_joint</jointName>
     <linkName>sol_arka_pervane_1</linkName>
-    <turningDirection>cw</turningDirection>
+    <turningDirection>ccw</turningDirection>
     <timeConstantUp>0.0125</timeConstantUp>
     <timeConstantDown>0.025</timeConstantDown>
     <maxRotVelocity>2000.0</maxRotVelocity>
     <motorConstant>2.0e-05</motorConstant>
-    <momentConstant>0.016</momentConstant>
+    <momentConstant>0.0</momentConstant>
     <commandSubTopic>command/motor_speed</commandSubTopic>
     <actuator_number>1</actuator_number>
     <motorNumber>1</motorNumber>
@@ -144,12 +144,12 @@
     <robotNamespace>eternalmorph</robotNamespace>
     <jointName>sag_on_pervane_joint</jointName>
     <linkName>sag_on_pervane_1</linkName>
-    <turningDirection>cw</turningDirection>
+    <turningDirection>ccw</turningDirection>
     <timeConstantUp>0.0125</timeConstantUp>
     <timeConstantDown>0.025</timeConstantDown>
     <maxRotVelocity>2000.0</maxRotVelocity>
     <motorConstant>2.0e-05</motorConstant>
-    <momentConstant>0.016</momentConstant>
+    <momentConstant>0.0</momentConstant>
     <commandSubTopic>command/motor_speed</commandSubTopic>
     <actuator_number>2</actuator_number>
     <motorNumber>2</motorNumber>
@@ -168,7 +168,7 @@
     <timeConstantDown>0.025</timeConstantDown>
     <maxRotVelocity>2000.0</maxRotVelocity>
     <motorConstant>2.0e-05</motorConstant>
-    <momentConstant>0.016</momentConstant>
+    <momentConstant>0.0</momentConstant>
     <commandSubTopic>command/motor_speed</commandSubTopic>
     <actuator_number>3</actuator_number>
     <motorNumber>3</motorNumber>
