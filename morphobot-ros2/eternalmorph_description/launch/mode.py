@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
+import os
 import sys
 import time
 import math
+import json
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64
 from sensor_msgs.msg import JointState
+from geometry_msgs.msg import Twist
+
+STATE_FILE = '/tmp/eternalmorph_state.json'
 
 class ModeControllerNode(Node):
     def __init__(self, requested_mode=None, transition_time=3.0):
@@ -89,31 +94,103 @@ class ModeControllerNode(Node):
         self.js_cmd_pub = self.create_publisher(JointState, '/joint_states_cmd', 10)
         self.js_direct_pub = self.create_publisher(JointState, '/joint_states', 10)
 
+        # DiffDrive tekerlek durdurma konusu
+        self.cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
+
         # /joint_states konusunu dinle (mevcut pozisyonu almak için)
         self.current_joint_states = {}
         self.js_sub = self.create_subscription(JointState, '/joint_states', self._js_callback, 10)
 
-        # Mevcut joint_state gelmesi için kısa bir süre spin yap
+        # Mevcut eklem açılarını oku (DDS keşfi için bekle)
+        self.get_logger().info("Mevcut eklem durumları (/joint_states) okunuyor...")
         start_wait = time.time()
-        while time.time() - start_wait < 0.2:
+        while time.time() - start_wait < 2.0 and rclpy.ok():
             rclpy.spin_once(self, timeout_sec=0.05)
+            # Tüm hedef eklemlerimizin açısı geldi mi kontrol et
+            if all(j in self.current_joint_states for j in self.joints):
+                break
 
         # Başlangıç pozisyonlarını belirle
         start_targets = {}
-        for j in self.joints:
-            if j in self.current_joint_states:
+        received_all = all(j in self.current_joint_states for j in self.joints)
+
+        if received_all:
+            for j in self.joints:
                 start_targets[j] = self.current_joint_states[j]
+            self.get_logger().info("Mevcut eklem pozisyonları Gazebo'dan başarıyla okundu.")
+        else:
+            # Fallback: Önbellekteki son bilinen modu oku
+            cached_mode = self._read_cached_mode()
+            self.get_logger().warn(f"Joint states zaman aşımına uğradı! Önbellekteki mod kullanılıyor: '{cached_mode}'")
+            cached_targets = self.mode_targets.get(cached_mode, self.mode_targets['default_mode'])
+            for j in self.joints:
+                if j in self.current_joint_states:
+                    start_targets[j] = self.current_joint_states[j]
+                else:
+                    start_targets[j] = cached_targets.get(j, 0.0)
+
+        # Mevcut robot modunu tespit et
+        current_mode = self._detect_current_mode(start_targets)
+        self.get_logger().info(f"Tespit edilen başlangıç durumu: '{current_mode}'")
+
+        # Geçiş aşamalarını belirle (air_mode geçişleri zorunlu olarak ground_mode üzerinden yapılır)
+        stages = self._determine_mode_stages(current_mode, mode_key)
+        self.get_logger().info(f"Planlanan geçiş rotası: {' -> '.join(stages)} (Hedef: {mode_key})")
+
+        # Aşamaları sırayla icra et
+        active_start_targets = dict(start_targets)
+        for idx, stage_mode in enumerate(stages, 1):
+            stage_targets = self.mode_targets[stage_mode]
+            self.get_logger().info(f"--- Aşama {idx}/{len(stages)}: '{stage_mode}' pozisyonuna geçiliyor ({self.transition_time}s) ---")
+            active_start_targets = self._execute_transition(active_start_targets, stage_targets, stage_mode, self.transition_time)
+
+        # Başarıyla geçilen nihai modu önbelleğe kaydet
+        self._save_cached_mode(mode_key)
+
+        # DiffDrive tekerlek komutlarını sıfırla (tekerleklerin kaymasını/dönmesini durdur)
+        stop_msg = Twist()
+        self.cmd_vel_pub.publish(stop_msg)
+
+        self.get_logger().info(f"Tüm aşamalar başarıyla tamamlandı! Robot '{mode_key}' konumunda.")
+
+    def _detect_current_mode(self, current_positions):
+        air_angle = abs(current_positions.get('sol_on_air_mode', 0.0))
+        ground_angle = abs(current_positions.get('sol_on_ground_mode', 0.0))
+
+        if air_angle > 0.6:
+            return 'air_mode'
+        elif ground_angle > 0.6:
+            return 'ground_mode'
+        elif ground_angle < 0.4 and air_angle < 0.4:
+            return 'default_mode'
+        return self._read_cached_mode()
+
+    def _determine_mode_stages(self, current_mode, target_mode):
+        if target_mode == current_mode:
+            return [target_mode]
+
+        # 1. air_mode'a gidiliyorsa ve robot ground_mode'da değilse: önce ground_mode'a geç
+        if target_mode == 'air_mode':
+            if current_mode != 'ground_mode':
+                return ['ground_mode', 'air_mode']
             else:
-                # Joint state henüz alınamadıysa varsayılan 0.0
-                start_targets[j] = 0.0
+                return ['air_mode']
 
-        self.get_logger().info(f"Mod geçişi başlatılıyor: '{mode_key}' (Süre: {self.transition_time}s)...")
+        # 2. air_mode'dan başka bir moda gidiliyorsa: önce ground_mode'a geç
+        if current_mode == 'air_mode':
+            if target_mode != 'ground_mode':
+                return ['ground_mode', target_mode]
+            else:
+                return ['ground_mode']
 
-        # Sinüzoidal yumuşatılmış geçiş (S-curve)
+        # Standart geçiş (default <-> ground)
+        return [target_mode]
+
+    def _execute_transition(self, start_targets, end_targets, stage_mode, duration):
         start_time = time.time()
         while rclpy.ok():
             elapsed = time.time() - start_time
-            progress = min(1.0, elapsed / self.transition_time)
+            progress = min(1.0, elapsed / duration)
 
             factor = 0.5 * (1.0 - math.cos(math.pi * progress))
 
@@ -145,35 +222,70 @@ class ModeControllerNode(Node):
 
         # Hedef konumda tutmak için kısa bir süre daha yayınla
         end_time = time.time()
-        while time.time() - end_time < 0.5 and rclpy.ok():
+        while time.time() - end_time < 0.3 and rclpy.ok():
             for j, val in end_targets.items():
                 msg = Float64()
                 msg.data = float(val)
                 self.pubs[j].publish(msg)
             time.sleep(0.05)
 
-        self.get_logger().info(f"'{mode_key}' pozisyonuna başarıyla geçildi!")
+        self._save_cached_mode(stage_mode)
+        return end_targets
 
     def _js_callback(self, msg: JointState):
         for name, pos in zip(msg.name, msg.position):
             if name in self.joints:
                 self.current_joint_states[name] = pos
 
-def parse_mode_from_args(argv):
+    def _read_cached_mode(self):
+        try:
+            if os.path.exists(STATE_FILE):
+                with open(STATE_FILE, 'r') as f:
+                    data = json.load(f)
+                    return data.get('mode', 'default_mode')
+        except Exception:
+            pass
+        return 'default_mode'
+
+    def _save_cached_mode(self, mode_name):
+        try:
+            with open(STATE_FILE, 'w') as f:
+                json.dump({'mode': mode_name, 'timestamp': time.time()}, f)
+        except Exception:
+            pass
+
+def parse_args(argv):
     requested_mode = None
+    transition_time = 3.0
+    
+    positional = []
     for arg in argv[1:]:
         if arg.startswith('mode:='):
             requested_mode = arg.split(':=', 1)[1]
+        elif arg.startswith('transition_time:='):
+            try:
+                transition_time = float(arg.split(':=', 1)[1])
+            except ValueError:
+                pass
         elif arg.startswith('--ros-args') or arg.startswith('-r') or arg.startswith('__'):
             continue
         elif not arg.startswith('-'):
-            requested_mode = arg
-    return requested_mode
+            positional.append(arg)
+
+    if not requested_mode and len(positional) > 0:
+        requested_mode = positional[0]
+    if len(positional) > 1:
+        try:
+            transition_time = float(positional[1])
+        except ValueError:
+            pass
+
+    return requested_mode, transition_time
 
 def main(args=None):
     rclpy.init(args=args)
-    cli_mode = parse_mode_from_args(sys.argv)
-    node = ModeControllerNode(requested_mode=cli_mode)
+    cli_mode, cli_time = parse_args(sys.argv)
+    node = ModeControllerNode(requested_mode=cli_mode, transition_time=cli_time)
     node.destroy_node()
     rclpy.shutdown()
 

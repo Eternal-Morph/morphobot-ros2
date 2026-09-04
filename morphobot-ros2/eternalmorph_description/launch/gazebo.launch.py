@@ -69,7 +69,7 @@ def generate_launch_description():
     bridge_args = [
         '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
         '/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist',
-        '/joint_states@sensor_msgs/msg/JointState[gz.msgs.Model',
+        '/world/empty/model/eternalmorph/joint_state@sensor_msgs/msg/JointState[gz.msgs.Model',
         '/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry',
         '/eternalmorph/sol_on_ground_mode/cmd_pos@std_msgs/msg/Float64]gz.msgs.Double',
         '/eternalmorph/sol_on_air_mode/cmd_pos@std_msgs/msg/Float64]gz.msgs.Double',
@@ -86,6 +86,9 @@ def generate_launch_description():
         package='ros_gz_bridge',
         executable='parameter_bridge',
         arguments=bridge_args,
+        remappings=[
+            ('/world/empty/model/eternalmorph/joint_state', '/joint_states'),
+        ],
         output='screen'
     )
 

@@ -132,9 +132,9 @@
     <material name="silver"/>
   </visual>
   <collision>
-    <origin xyz="-0.293181 -0.244976 -0.019994" rpy="0 0 0"/>
+    <origin xyz="-0.0165 0 0" rpy="0 1.5707963 0"/>
     <geometry>
-      <mesh filename="package://eternalmorph_description/meshes/sol_on_teker_1.stl" scale="0.001 0.001 0.001"/>
+      <cylinder radius="0.0795" length="0.033"/>
     </geometry>
   </collision>
 </link>
@@ -153,9 +153,9 @@
     <material name="silver"/>
   </visual>
   <collision>
-    <origin xyz="-0.293181 0.374976 -0.020006" rpy="0 0 0"/>
+    <origin xyz="-0.0165 0 0" rpy="0 1.5707963 0"/>
     <geometry>
-      <mesh filename="package://eternalmorph_description/meshes/sol_arka_teker_1.stl" scale="0.001 0.001 0.001"/>
+      <cylinder radius="0.0795" length="0.033"/>
     </geometry>
   </collision>
 </link>
@@ -174,9 +174,9 @@
     <material name="silver"/>
   </visual>
   <collision>
-    <origin xyz="-0.546819 -0.244976 -0.020006" rpy="0 0 0"/>
+    <origin xyz="0.0165 0 0" rpy="0 1.5707963 0"/>
     <geometry>
-      <mesh filename="package://eternalmorph_description/meshes/sag_on_teker_1.stl" scale="0.001 0.001 0.001"/>
+      <cylinder radius="0.0795" length="0.033"/>
     </geometry>
   </collision>
 </link>
@@ -195,9 +195,9 @@
     <material name="silver"/>
   </visual>
   <collision>
-    <origin xyz="-0.546819 0.374976 -0.019994" rpy="0 0 0"/>
+    <origin xyz="0.0165 0 0" rpy="0 1.5707963 0"/>
     <geometry>
-      <mesh filename="package://eternalmorph_description/meshes/sag_arka_teker_1.stl" scale="0.001 0.001 0.001"/>
+      <cylinder radius="0.0795" length="0.033"/>
     </geometry>
   </collision>
 </link>
@@ -504,6 +504,7 @@
   <parent link="sol_on_tekerlek_eksen_1"/>
   <child link="sol_on_teker_1"/>
   <axis xyz="1.0 0.0 0.0"/>
+  <dynamics damping="0.05" friction="0.01"/>
 </joint>
 
 <joint name="sol_arka_teker" type="continuous">
@@ -511,6 +512,7 @@
   <parent link="sol_arka_tekerlek_eksen_1"/>
   <child link="sol_arka_teker_1"/>
   <axis xyz="1.0 0.0 0.0"/>
+  <dynamics damping="0.05" friction="0.01"/>
 </joint>
 
 <joint name="sag_on_teker" type="continuous">
@@ -518,6 +520,7 @@
   <parent link="sag_on_tekerlek_eksen_1"/>
   <child link="sag_on_teker_1"/>
   <axis xyz="1.0 0.0 0.0"/>
+  <dynamics damping="0.05" friction="0.01"/>
 </joint>
 
 <joint name="sag_arka_teker" type="continuous">
@@ -525,6 +528,7 @@
   <parent link="sag_arka_tekerlek_eksen_1"/>
   <child link="sag_arka_teker_1"/>
   <axis xyz="1.0 0.0 0.0"/>
+  <dynamics damping="0.05" friction="0.01"/>
 </joint>
 
 <joint name="sol_on_pervane_joint" type="continuous">
@@ -566,7 +570,7 @@
   <parent link="sol_on_tutucu_parca_1"/>
   <child link="sol_on_tekerlek_eksen_1"/>
   <axis xyz="-1.0 -0.0 0.0"/>
-  <limit upper="1.570796" lower="-0.1" effort="200" velocity="100"/>
+  <limit upper="1.7" lower="-0.2" effort="200" velocity="100"/>
   <dynamics damping="2.0" friction="0.2"/>
 </joint>
 
@@ -575,7 +579,7 @@
   <parent link="sol_on_ust_motor_1"/>
   <child link="sol_on_tutucu_parca_1"/>
   <axis xyz="0.0 -1.0 -0.0"/>
-  <limit upper="0.1" lower="-1.570796" effort="200" velocity="100"/>
+  <limit upper="0.2" lower="-1.7" effort="200" velocity="100"/>
   <dynamics damping="2.0" friction="0.2"/>
 </joint>
 
@@ -584,7 +588,7 @@
   <parent link="sag_on_tutucu_parca_1"/>
   <child link="sag_on_tekerlek_eksen_1"/>
   <axis xyz="1.0 0.0 0.0"/>
-  <limit upper="0.1" lower="-1.570796" effort="200" velocity="100"/>
+  <limit upper="0.2" lower="-1.7" effort="200" velocity="100"/>
   <dynamics damping="2.0" friction="0.2"/>
 </joint>
 
@@ -593,7 +597,7 @@
   <parent link="sag_on_ust_motor_1"/>
   <child link="sag_on_tutucu_parca_1"/>
   <axis xyz="0.0 -1.0 0.0"/>
-  <limit upper="1.570796" lower="-0.1" effort="200" velocity="100"/>
+  <limit upper="1.7" lower="-0.2" effort="200" velocity="100"/>
   <dynamics damping="2.0" friction="0.2"/>
 </joint>
 
@@ -602,7 +606,7 @@
   <parent link="sol_arka_tutucu_parca_1"/>
   <child link="sol_arka_tekerlek_eksen_1"/>
   <axis xyz="-1.0 -0.0 -0.0"/>
-  <limit upper="0.1" lower="-1.570796" effort="200" velocity="100"/>
+  <limit upper="0.2" lower="-1.7" effort="200" velocity="100"/>
   <dynamics damping="2.0" friction="0.2"/>
 </joint>
 
@@ -611,7 +615,7 @@
   <parent link="sol_arka_ust_motor_1"/>
   <child link="sol_arka_tutucu_parca_1"/>
   <axis xyz="-0.0 1.0 0.0"/>
-  <limit upper="1.570796" lower="-0.1" effort="200" velocity="100"/>
+  <limit upper="1.7" lower="-0.2" effort="200" velocity="100"/>
   <dynamics damping="2.0" friction="0.2"/>
 </joint>
 
@@ -620,7 +624,7 @@
   <parent link="sag_arka_tutucu_parca_1"/>
   <child link="sag_arka_tekerlek_eksen_1"/>
   <axis xyz="1.0 0.0 0.0"/>
-  <limit upper="1.570796" lower="-0.1" effort="200" velocity="100"/>
+  <limit upper="1.7" lower="-0.2" effort="200" velocity="100"/>
   <dynamics damping="2.0" friction="0.2"/>
 </joint>
 
@@ -629,7 +633,7 @@
   <parent link="sag_arka_ust_motor_1"/>
   <child link="sag_arka_tutucu_parca_1"/>
   <axis xyz="-0.0 1.0 0.0"/>
-  <limit upper="0.1" lower="-1.570796" effort="200" velocity="100"/>
+  <limit upper="0.2" lower="-1.7" effort="200" velocity="100"/>
   <dynamics damping="2.0" friction="0.2"/>
 </joint>
 
