@@ -24,6 +24,12 @@
       name="gz::sim::systems::Contact">
     </plugin>
 
+    <!-- IMU System Plugin for IMU Sensor Simulation -->
+    <plugin
+      filename="gz-sim-imu-system"
+      name="gz::sim::systems::Imu">
+    </plugin>
+
     <!-- Sensors System Plugin for Camera / Sensors Simulation -->
     <plugin
       filename="gz-sim-sensors-system"

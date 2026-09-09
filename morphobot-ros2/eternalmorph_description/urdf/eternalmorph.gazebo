@@ -10,6 +10,12 @@
     name="gz::sim::systems::JointStatePublisher">
   </plugin>
 
+  <!-- IMU System Plugin -->
+  <plugin
+    filename="gz-sim-imu-system"
+    name="gz::sim::systems::Imu">
+  </plugin>
+
   <!-- Diff Drive / Skid Steer Control Plugin -->
   <plugin
     filename="gz-sim-diff-drive-system"
@@ -111,7 +117,7 @@
     <timeConstantDown>0.025</timeConstantDown>
     <maxRotVelocity>2000.0</maxRotVelocity>
     <motorConstant>2.0e-05</motorConstant>
-    <momentConstant>0.0</momentConstant>
+    <momentConstant>0.04</momentConstant>
     <commandSubTopic>command/motor_speed</commandSubTopic>
     <actuator_number>0</actuator_number>
     <motorNumber>0</motorNumber>
@@ -130,7 +136,7 @@
     <timeConstantDown>0.025</timeConstantDown>
     <maxRotVelocity>2000.0</maxRotVelocity>
     <motorConstant>2.0e-05</motorConstant>
-    <momentConstant>0.0</momentConstant>
+    <momentConstant>0.04</momentConstant>
     <commandSubTopic>command/motor_speed</commandSubTopic>
     <actuator_number>1</actuator_number>
     <motorNumber>1</motorNumber>
@@ -149,7 +155,7 @@
     <timeConstantDown>0.025</timeConstantDown>
     <maxRotVelocity>2000.0</maxRotVelocity>
     <motorConstant>2.0e-05</motorConstant>
-    <momentConstant>0.0</momentConstant>
+    <momentConstant>0.04</momentConstant>
     <commandSubTopic>command/motor_speed</commandSubTopic>
     <actuator_number>2</actuator_number>
     <motorNumber>2</motorNumber>
@@ -168,7 +174,7 @@
     <timeConstantDown>0.025</timeConstantDown>
     <maxRotVelocity>2000.0</maxRotVelocity>
     <motorConstant>2.0e-05</motorConstant>
-    <momentConstant>0.0</momentConstant>
+    <momentConstant>0.04</momentConstant>
     <commandSubTopic>command/motor_speed</commandSubTopic>
     <actuator_number>3</actuator_number>
     <motorNumber>3</motorNumber>
@@ -367,6 +373,15 @@
         <far>300</far>
       </clip>
     </camera>
+  </sensor>
+</gazebo>
+
+<gazebo reference="imu_link">
+  <sensor name="imu_sensor" type="imu">
+    <always_on>1</always_on>
+    <update_rate>100</update_rate>
+    <visualize>true</visualize>
+    <topic>/imu/sim_data</topic>
   </sensor>
 </gazebo>
 

@@ -80,6 +80,7 @@ def generate_launch_description():
         '/eternalmorph/sag_arka_ground_mode/cmd_pos@std_msgs/msg/Float64]gz.msgs.Double',
         '/eternalmorph/sag_arka_air_mode/cmd_pos@std_msgs/msg/Float64]gz.msgs.Double',
         '/eternalmorph/command/motor_speed@actuator_msgs/msg/Actuators]gz.msgs.Actuators',
+        '/imu/sim_data@sensor_msgs/msg/Imu[gz.msgs.IMU',
     ]
 
     bridge = Node(

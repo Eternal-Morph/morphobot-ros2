@@ -673,4 +673,19 @@
     <child link="camera_1_optical_frame"/>
   </joint>
 
+  <!-- IMU link placed at the robot's actual Center of Mass (CoM) -->
+  <link name="imu_link">
+    <inertial>
+      <mass value="0.001"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-07" iyy="1e-07" izz="1e-07" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+
+  <joint name="imu_joint" type="fixed">
+    <origin xyz="0.4200 -0.0644 0.0236" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+  </joint>
+
 </robot>
