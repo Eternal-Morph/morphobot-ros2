@@ -18,23 +18,23 @@ from std_msgs.msg import Float64
 
 HELP_MSG = """
 ====================================================================
-🚁 ETERNALMORPH KAPALI ÇEVRİM PID UÇUŞ KONTROLCÜSÜ
+🚁 ETERNALMORPH SAKİN & HASSAS PID UÇUŞ KONTROLCÜSÜ
 ====================================================================
-[GAZ (THROTTLE) & İRTİFA]
-  H              : 🎯 HOVER KİLİDİ (Doğrudan 1230 rad/s düz kalkış)
-  W / S          : Gaz Artır / Azalt (±50 rad/s)
-  Shift + W / S  : Hızlı Gaz Artır / Azalt (±100 rad/s)
+[GAZ (THROTTLE) & İRTİFA - ÇOK HASSAS KONTROL]
+  H              : 🎯 HOVER KİLİDİ (1226 rad/s - Havada sabit asılı kalır)
+  w / s          : Yavaş Yüksel / Alçal (±5 rad/s - Sakin ve kontrollü)
+  Shift + W / S  : Hızlı Yüksel / Alçal (±25 rad/s)
   SPACE (Boşluk) : 🛑 ACİL MOTOR DURDUR (Gaz = 0)
 
-[YÖN KONTROLÜ (AÇI HEDEFİ - PID OTOMATİK DENGELER)]
-  Yukarı Ok / I   : İleri Uç (Burnu öne eğer)
-  Aşağı Ok  / K   : Geri Uç  (Burnu arkaya eğer)
-  Sol Ok    / J   : Sola Uç  (Sola yatar)
-  Sağ Ok    / L   : Sağa Uç  (Sağa yatar)
-  X               : Hedef Açıları Sıfırla (Havada Düz Sabit Kal)
+[YÖN KONTROLÜ - YAYLI & OTOMATİK DÜZELEN (AUTO-LEVEL)]
+  Yukarı Ok / I   : İleri Süzül (Tuş basılıyken hafif eğilir, bırakınca düzleşip durur)
+  Aşağı Ok  / K   : Geri Süzül  (Tuş basılıyken hafif eğilir, bırakınca düzleşip durur)
+  Sol Ok    / J   : Sola Süzül  (Tuş basılıyken hafif yatar, bırakınca düzleşip durur)
+  Sağ Ok    / L   : Sağa Süzül  (Tuş basılıyken hafif yatar, bırakınca düzleşip durur)
+  X               : Tam Dur & Hover (Açıları sıfırlar ve 1226 rad/s hover'a kilitler)
 
 [DÖNÜŞ (YAW)]
-  A / D          : Sola / Sağa Dönüş (Test)
+  A / D          : Sola / Sağa Dönüş (Tuşu bırakınca durur)
 
 [DİĞER]
   P              : PID Dengeleyiciyi Aç / Kapat
@@ -101,6 +101,7 @@ class FlightPIDTeleop(Node):
             sensor_qos
         )
 
+        self.hover_throttle = 1226.0  # Tam 0 ivme asılı kalma hızı (12.259 kg @ 2e-5 Ct)
         self.target_throttle = 0.0
         self.actual_throttle = 0.0
         self.max_motor_vel = 2000.0  # rad/s
@@ -109,6 +110,12 @@ class FlightPIDTeleop(Node):
         self.target_pitch = 0.0
         self.target_roll = 0.0
         self.target_yaw_rate = 0.0
+
+        # Yaylı tuş komutları (tuş basılıyken hafifçe eğilir/döner, bırakınca kendiliğinden sıfırlanır)
+        self.pitch_command_dir = 0.0
+        self.last_pitch_time = 0.0
+        self.roll_command_dir = 0.0
+        self.last_roll_time = 0.0
         self.yaw_command_dir = 0.0
         self.last_yaw_time = 0.0
 
@@ -181,15 +188,36 @@ class FlightPIDTeleop(Node):
             self.integral_pitch = 0.0
             self.integral_roll = 0.0
 
-        # Dönüş (Yaw) komutunu pürüzsüzleştir (Tuş titremesini ve sendelemeyi tamamen keser)
         now_sec = time.time()
+
+        # İleri / Geri (Pitch) - Tuş basılıyken hafifçe öne/arkaya eğilir (~3.5°), bırakılınca kendiliğinden düzleşir
+        MAX_PITCH_ANGLE = math.radians(3.5)  # 3.5 derece - sakin ve yumuşak süzülme
+        if (now_sec - self.last_pitch_time) < 0.28:
+            desired_pitch = self.pitch_command_dir * MAX_PITCH_ANGLE
+        else:
+            desired_pitch = 0.0
+            self.pitch_command_dir = 0.0
+
+        # Sağ / Sol (Roll) - Tuş basılıyken hafifçe yatar (~3.5°), bırakılınca kendiliğinden düzleşir
+        MAX_ROLL_ANGLE = math.radians(3.5)   # 3.5 derece - sakin ve yumuşak süzülme
+        if (now_sec - self.last_roll_time) < 0.28:
+            desired_roll = self.roll_command_dir * MAX_ROLL_ANGLE
+        else:
+            desired_roll = 0.0
+            self.roll_command_dir = 0.0
+
+        # Dönüş (Yaw) komutu - Tuş basılıyken döner, bırakılınca durur
         if (now_sec - self.last_yaw_time) < 0.28:
-            desired_yaw = self.yaw_command_dir * 0.50  # rad/s (~29 deg/s)
+            desired_yaw = self.yaw_command_dir * 0.40  # rad/s (~23 deg/s)
         else:
             desired_yaw = 0.0
             self.yaw_command_dir = 0.0
 
-        # Yumuşak yaw rampası
+        # Pürüzsüz açı ve hız rampası (sarsıntısız yumuşak geçiş)
+        angle_smoothing = min(1.0, 6.0 * dt)
+        self.target_pitch += angle_smoothing * (desired_pitch - self.target_pitch)
+        self.target_roll += angle_smoothing * (desired_roll - self.target_roll)
+
         rate_smoothing = min(1.0, 8.0 * dt)
         self.target_yaw_rate += rate_smoothing * (desired_yaw - self.target_yaw_rate)
 
@@ -288,45 +316,54 @@ def main():
 
             if key:
                 if key in ['h', 'H']:
-                    node.target_throttle = 1230.0
-                    node.actual_throttle = 1230.0  # Doğrudan kalkış kilit hızı
+                    node.target_throttle = node.hover_throttle
+                    if node.actual_throttle < 1000.0:
+                        node.actual_throttle = 1160.0  # Yumuşak zemin kalkışı başlat
                     node.target_pitch = 0.0
                     node.target_roll = 0.0
                     node.target_yaw_rate = 0.0
+                    node.pitch_command_dir = 0.0
+                    node.roll_command_dir = 0.0
                     node.yaw_command_dir = 0.0
                     node.integral_pitch = 0.0
                     node.integral_roll = 0.0
-                    status_msg = "🎯 HOVER KİLİDİ (1230 rad/s)"
+                    status_msg = f"🎯 HOVER KİLİDİ ({node.hover_throttle:.0f} rad/s)"
                 elif key in ['w', 'W']:
-                    step = 100.0 if key == 'W' else 50.0
+                    step = 25.0 if key == 'W' else 5.0
                     node.target_throttle = min(node.max_motor_vel, node.target_throttle + step)
-                    status_msg = f"Hedef Gaz: {node.target_throttle:.0f} (+{step:.0f})"
+                    status_msg = f"Gaz Artır: {node.target_throttle:.0f} (+{step:.0f})"
                 elif key in ['s', 'S']:
-                    step = 100.0 if key == 'S' else 50.0
+                    step = 25.0 if key == 'S' else 5.0
                     node.target_throttle = max(0.0, node.target_throttle - step)
-                    status_msg = f"Hedef Gaz: {node.target_throttle:.0f} (-{step:.0f})"
+                    status_msg = f"Gaz Azalt: {node.target_throttle:.0f} (-{step:.0f})"
                 elif key == ' ':
                     node.target_throttle = 0.0
                     node.actual_throttle = 0.0
                     node.target_pitch = 0.0
                     node.target_roll = 0.0
                     node.target_yaw_rate = 0.0
+                    node.pitch_command_dir = 0.0
+                    node.roll_command_dir = 0.0
                     node.yaw_command_dir = 0.0
                     node.integral_pitch = 0.0
                     node.integral_roll = 0.0
                     status_msg = "🛑 MOTORLAR DURDURULDU!"
                 elif key in ['\x1b[A', 'i', 'I']:  # Up Arrow
-                    node.target_pitch = max(-0.25, node.target_pitch - 0.05)
-                    status_msg = f"İleri (P:{math.degrees(node.target_pitch):+.1f}°)"
+                    node.pitch_command_dir = -1.0
+                    node.last_pitch_time = time.time()
+                    status_msg = "İleri Süzül"
                 elif key in ['\x1b[B', 'k', 'K']:  # Down Arrow
-                    node.target_pitch = min(0.25, node.target_pitch + 0.05)
-                    status_msg = f"Geri (P:{math.degrees(node.target_pitch):+.1f}°)"
+                    node.pitch_command_dir = 1.0
+                    node.last_pitch_time = time.time()
+                    status_msg = "Geri Süzül"
                 elif key in ['\x1b[D', 'j', 'J']:  # Left Arrow
-                    node.target_roll = max(-0.25, node.target_roll - 0.05)
-                    status_msg = f"Sola Yat (R:{math.degrees(node.target_roll):+.1f}°)"
+                    node.roll_command_dir = -1.0
+                    node.last_roll_time = time.time()
+                    status_msg = "Sola Süzül"
                 elif key in ['\x1b[C', 'l', 'L']:  # Right Arrow
-                    node.target_roll = min(0.25, node.target_roll + 0.05)
-                    status_msg = f"Sağa Yat (R:{math.degrees(node.target_roll):+.1f}°)"
+                    node.roll_command_dir = 1.0
+                    node.last_roll_time = time.time()
+                    status_msg = "Sağa Süzül"
                 elif key in ['a', 'A']:
                     node.yaw_command_dir = 1.0
                     node.last_yaw_time = time.time()
@@ -336,11 +373,14 @@ def main():
                     node.last_yaw_time = time.time()
                     status_msg = "Sağa Dönüş (Yaw)"
                 elif key in ['x', 'X']:
+                    node.pitch_command_dir = 0.0
+                    node.roll_command_dir = 0.0
+                    node.yaw_command_dir = 0.0
                     node.target_pitch = 0.0
                     node.target_roll = 0.0
                     node.target_yaw_rate = 0.0
-                    node.yaw_command_dir = 0.0
-                    status_msg = "Açılar Sıfırlandı (Hover / Sabit)"
+                    node.target_throttle = node.hover_throttle
+                    status_msg = f"Durdur & Hover ({node.hover_throttle:.0f})"
                 elif key in ['p', 'P']:
                     node.pid_enabled = not node.pid_enabled
                     state = "AÇIK" if node.pid_enabled else "KAPALI"
@@ -363,7 +403,7 @@ def main():
             sys.stdout.write(
                 f"\r[{pid_tag}|{imu_tag}] GAZ:{node.actual_throttle:4.0f}/{node.target_throttle:4.0f} | "
                 f"Açı: P:{cur_p_deg:+4.1f}° R:{cur_r_deg:+4.1f}° | "
-                f"M:[{m0:.0f}, {m1:.0f}, {m2:.0f}, {m3:.0f}] | {status_msg:<26}"
+                f"M:[{m0:.0f}, {m1:.0f}, {m2:.0f}, {m3:.0f}] | {status_msg:<32}"
             )
             sys.stdout.flush()
 
