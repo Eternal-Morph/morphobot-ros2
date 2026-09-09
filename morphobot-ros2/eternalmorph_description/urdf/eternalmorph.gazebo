@@ -125,7 +125,7 @@
     <robotNamespace>eternalmorph</robotNamespace>
     <jointName>sol_arka_pervane_joint</jointName>
     <linkName>sol_arka_pervane_1</linkName>
-    <turningDirection>ccw</turningDirection>
+    <turningDirection>cw</turningDirection>
     <timeConstantUp>0.0125</timeConstantUp>
     <timeConstantDown>0.025</timeConstantDown>
     <maxRotVelocity>2000.0</maxRotVelocity>
@@ -144,7 +144,7 @@
     <robotNamespace>eternalmorph</robotNamespace>
     <jointName>sag_on_pervane_joint</jointName>
     <linkName>sag_on_pervane_1</linkName>
-    <turningDirection>ccw</turningDirection>
+    <turningDirection>cw</turningDirection>
     <timeConstantUp>0.0125</timeConstantUp>
     <timeConstantDown>0.025</timeConstantDown>
     <maxRotVelocity>2000.0</maxRotVelocity>
