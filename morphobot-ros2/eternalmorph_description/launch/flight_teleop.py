@@ -14,6 +14,7 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 from sensor_msgs.msg import Imu
 from actuator_msgs.msg import Actuators
+from nav_msgs.msg import Odometry
 from std_msgs.msg import Float64
 
 HELP_MSG = """
@@ -26,15 +27,19 @@ HELP_MSG = """
   Shift + W / S  : Hızlı Yüksel / Alçal (±25 rad/s)
   SPACE (Boşluk) : 🛑 ACİL MOTOR DURDUR (Gaz = 0)
 
-[YÖN KONTROLÜ - YAYLI & OTOMATİK DÜZELEN (AUTO-LEVEL)]
-  Yukarı Ok / I   : İleri Süzül (Tuş basılıyken hafif eğilir, bırakınca düzleşip durur)
-  Aşağı Ok  / K   : Geri Süzül  (Tuş basılıyken hafif eğilir, bırakınca düzleşip durur)
-  Sol Ok    / J   : Sola Süzül  (Tuş basılıyken hafif yatar, bırakınca düzleşip durur)
-  Sağ Ok    / L   : Sağa Süzül  (Tuş basılıyken hafif yatar, bırakınca düzleşip durur)
-  X               : Tam Dur & Hover (Açıları sıfırlar ve 1226 rad/s hover'a kilitler)
+[YÖN KONTROLÜ - YAYLI & ANLIK FRENLEME (AUTO-LEVEL)]
+  Yukarı Ok / I   : İleri Süzül (Tuş basılıyken hafif eğilir, bırakınca düzleşir)
+  Aşağı Ok  / K   : Geri Süzül / ANLIK FREN (İleri kaymayı durdurmak için 0.5 sn bas-bırak)
+  Sol Ok    / J   : Sola Süzül  (Tuş basılıyken hafif yatar, bırakınca düzleşir)
+  Sağ Ok    / L   : Sağa Süzül  (Tuş basılıyken hafif yatar, bırakınca düzleşir)
+  X               : Tam Dur & Hover (Trimi ve açıları sıfırlar, 1226 rad/s hover)
 
 [DÖNÜŞ (YAW)]
   A / D          : Sola / Sağa Dönüş (Tuşu bırakınca durur)
+
+[TRİM AYARI (KAYMAYI DÜZELTME)]
+  9 veya [       : Trimi Geriye Al (+0.2° - İleri kaymayı durdurur)
+  0 veya ]       : Trimi İleriye Al (-0.2° - Geri kaymayı durdurur)
 
 [DİĞER]
   P              : PID Dengeleyiciyi Aç / Kapat
@@ -101,6 +106,16 @@ class FlightPIDTeleop(Node):
             sensor_qos
         )
 
+        self.odom_sub = self.create_subscription(
+            Odometry,
+            '/odom',
+            self.odom_callback,
+            sensor_qos
+        )
+        self.has_odom = False
+        self.vel_x = 0.0
+        self.vel_y = 0.0
+
         self.hover_throttle = 1226.0  # Tam 0 ivme asılı kalma hızı (12.259 kg @ 2e-5 Ct)
         self.target_throttle = 0.0
         self.actual_throttle = 0.0
@@ -110,6 +125,7 @@ class FlightPIDTeleop(Node):
         self.target_pitch = 0.0
         self.target_roll = 0.0
         self.target_yaw_rate = 0.0
+        self.pitch_trim = 0.0  # radyan (Denge trimi - ileri/geri kaymayı sıfırlar)
 
         # Yaylı tuş komutları (tuş basılıyken hafifçe eğilir/döner, bırakınca kendiliğinden sıfırlanır)
         self.pitch_command_dir = 0.0
@@ -130,18 +146,29 @@ class FlightPIDTeleop(Node):
         # Eksen eylemsizliklerine göre (I_xx=0.34, I_yy=0.21) ayrı ayrı optimize edilmiş kazançlar
         self.kp_pitch = 120.0
         self.kd_pitch = 38.0
-        self.ki_pitch = 0.5
+        self.ki_pitch = 12.0  # Statik burun yatıklığını ve ağırlık merkezi kaymasını yok eder
 
         # Roll ekseni eylemsizliği daha küçük olduğu için kazançlar daha yumuşak (sağa-sola sallanmayı keser)
         self.kp_roll = 75.0
         self.kd_roll = 24.0
-        self.ki_roll = 0.2
+        self.ki_roll = 8.0
 
         self.kp_yaw = 50.0
 
         self.integral_pitch = 0.0
         self.integral_roll = 0.0
         self.last_time = self.get_clock().now()
+
+    def odom_callback(self, msg: Odometry):
+        # Dünya hızını robotun gövde yönüne çevir (Yaw ile dönüştür)
+        # Robot koordinatı: +Y İleri (Burun), +X Sağ
+        vx_w = msg.twist.twist.linear.x
+        vy_w = msg.twist.twist.linear.y
+        cy = math.cos(self.current_yaw)
+        sy = math.sin(self.current_yaw)
+        self.vel_x = cy * vx_w + sy * vy_w   # Sağ/sol hız
+        self.vel_y = -sy * vx_w + cy * vy_w  # İleri/geri hız
+        self.has_odom = True
 
     def imu_callback(self, msg: Imu):
         q = msg.orientation
@@ -190,12 +217,16 @@ class FlightPIDTeleop(Node):
 
         now_sec = time.time()
 
-        # İleri / Geri (Pitch) - Tuş basılıyken hafifçe öne/arkaya eğilir (~3.5°), bırakılınca kendiliğinden düzleşir
+        # İleri / Geri (Pitch) - Tuş basılıyken hafifçe öne/arkaya eğilir (~3.5°), bırakılınca trime döner
         MAX_PITCH_ANGLE = math.radians(3.5)  # 3.5 derece - sakin ve yumuşak süzülme
         if (now_sec - self.last_pitch_time) < 0.28:
-            desired_pitch = self.pitch_command_dir * MAX_PITCH_ANGLE
+            desired_pitch = self.pitch_trim + self.pitch_command_dir * MAX_PITCH_ANGLE
         else:
-            desired_pitch = 0.0
+            # Otomatik Hız Frenlemesi (Eğer odom varsa ve kullanıcı yön vermiyorsa)
+            auto_brake = 0.0
+            if self.has_odom and self.actual_throttle >= 1210.0:
+                auto_brake = max(-0.06, min(0.06, 0.05 * self.vel_y))
+            desired_pitch = self.pitch_trim + auto_brake
             self.pitch_command_dir = 0.0
 
         # Sağ / Sol (Roll) - Tuş basılıyken hafifçe yatar (~3.5°), bırakılınca kendiliğinden düzleşir
@@ -203,7 +234,10 @@ class FlightPIDTeleop(Node):
         if (now_sec - self.last_roll_time) < 0.28:
             desired_roll = self.roll_command_dir * MAX_ROLL_ANGLE
         else:
-            desired_roll = 0.0
+            auto_brake_r = 0.0
+            if self.has_odom and self.actual_throttle >= 1210.0:
+                auto_brake_r = -max(-0.06, min(0.06, 0.05 * self.vel_x))
+            desired_roll = auto_brake_r
             self.roll_command_dir = 0.0
 
         # Dönüş (Yaw) komutu - Tuş basılıyken döner, bırakılınca durur
@@ -238,9 +272,11 @@ class FlightPIDTeleop(Node):
 
             # Pitch PID (Burun Dengeleme)
             err_pitch = self.target_pitch - self.current_pitch
-            if self.actual_throttle >= 1150.0:
+            if self.actual_throttle >= 1210.0:
                 self.integral_pitch += err_pitch * dt
-                self.integral_pitch = max(-0.10, min(0.10, self.integral_pitch))
+                self.integral_pitch = max(-1.5, min(1.5, self.integral_pitch))
+            else:
+                self.integral_pitch = 0.0
 
             u_pitch = (cur_kp_p * err_pitch +
                        cur_ki_p * self.integral_pitch -
@@ -248,9 +284,11 @@ class FlightPIDTeleop(Node):
 
             # Roll PID (Sağ/Sol Dengeleme)
             err_roll = self.target_roll - self.current_roll
-            if self.actual_throttle >= 1150.0:
+            if self.actual_throttle >= 1210.0:
                 self.integral_roll += err_roll * dt
-                self.integral_roll = max(-0.10, min(0.10, self.integral_roll))
+                self.integral_roll = max(-1.5, min(1.5, self.integral_roll))
+            else:
+                self.integral_roll = 0.0
 
             u_roll = (cur_kp_r * err_roll +
                       cur_ki_r * self.integral_roll -
@@ -266,14 +304,13 @@ class FlightPIDTeleop(Node):
             u_yaw = max(-45.0, min(45.0, u_yaw))
 
         # Motor Mikseri:
-        # Motor 0 (Sol Ön - FL, CCW):   T + Pitch + Roll - Yaw
-        # Motor 1 (Sol Arka - RL, CW):  T - Pitch + Roll + Yaw
-        # Motor 2 (Sağ Ön - FR, CW):    T + Pitch - Roll + Yaw
-        # Motor 3 (Sağ Arka - RR, CCW): T - Pitch - Roll - Yaw
-        m0 = self.actual_throttle + u_pitch + u_roll - u_yaw
-        m1 = self.actual_throttle - u_pitch + u_roll + u_yaw
-        m2 = self.actual_throttle + u_pitch - u_roll + u_yaw
-        m3 = self.actual_throttle - u_pitch - u_roll - u_yaw
+        # Ağırlık merkezini dengeleyen ön/arka motor ofseti (+1.5 ön, -1.5 arka):
+        # Bu ofset kalkışta arka motorların önceden havalanmasını ve öne fırlamayı sıfırlar!
+        bias_pitch = 1.5
+        m0 = self.actual_throttle + bias_pitch + u_pitch + u_roll - u_yaw  # Sol Ön
+        m1 = self.actual_throttle - bias_pitch - u_pitch + u_roll + u_yaw  # Sol Arka
+        m2 = self.actual_throttle + bias_pitch + u_pitch - u_roll + u_yaw  # Sağ Ön
+        m3 = self.actual_throttle - bias_pitch - u_pitch - u_roll - u_yaw  # Sağ Arka
 
         m0 = max(0.0, min(self.max_motor_vel, m0))
         m1 = max(0.0, min(self.max_motor_vel, m1))
@@ -317,9 +354,8 @@ def main():
             if key:
                 if key in ['h', 'H']:
                     node.target_throttle = node.hover_throttle
-                    if node.actual_throttle < 1000.0:
-                        node.actual_throttle = 1160.0  # Yumuşak zemin kalkışı başlat
-                    node.target_pitch = 0.0
+                    node.actual_throttle = node.hover_throttle  # Yerden temiz ve direkt kalkış (yerde kaymadan)
+                    node.target_pitch = node.pitch_trim
                     node.target_roll = 0.0
                     node.target_yaw_rate = 0.0
                     node.pitch_command_dir = 0.0
@@ -355,7 +391,7 @@ def main():
                 elif key in ['\x1b[B', 'k', 'K']:  # Down Arrow
                     node.pitch_command_dir = 1.0
                     node.last_pitch_time = time.time()
-                    status_msg = "Geri Süzül"
+                    status_msg = "Geri Süzül (Fren)"
                 elif key in ['\x1b[D', 'j', 'J']:  # Left Arrow
                     node.roll_command_dir = -1.0
                     node.last_roll_time = time.time()
@@ -364,6 +400,12 @@ def main():
                     node.roll_command_dir = 1.0
                     node.last_roll_time = time.time()
                     status_msg = "Sağa Süzül"
+                elif key in ['9', '[']:
+                    node.pitch_trim = min(math.radians(3.0), node.pitch_trim + math.radians(0.05))
+                    status_msg = f"Trim Geri (P:{math.degrees(node.pitch_trim):+.2f}°)"
+                elif key in ['0', ']']:
+                    node.pitch_trim = max(-math.radians(3.0), node.pitch_trim - math.radians(0.05))
+                    status_msg = f"Trim İleri (P:{math.degrees(node.pitch_trim):+.2f}°)"
                 elif key in ['a', 'A']:
                     node.yaw_command_dir = 1.0
                     node.last_yaw_time = time.time()
@@ -373,12 +415,15 @@ def main():
                     node.last_yaw_time = time.time()
                     status_msg = "Sağa Dönüş (Yaw)"
                 elif key in ['x', 'X']:
+                    node.pitch_trim = 0.0  # Trimi de sıfırla
                     node.pitch_command_dir = 0.0
                     node.roll_command_dir = 0.0
                     node.yaw_command_dir = 0.0
                     node.target_pitch = 0.0
                     node.target_roll = 0.0
                     node.target_yaw_rate = 0.0
+                    node.integral_pitch = 0.0
+                    node.integral_roll = 0.0
                     node.target_throttle = node.hover_throttle
                     status_msg = f"Durdur & Hover ({node.hover_throttle:.0f})"
                 elif key in ['p', 'P']:
@@ -399,11 +444,13 @@ def main():
             imu_tag = "IMU:OK" if node.has_imu else "IMU:BEK"
             cur_p_deg = math.degrees(node.current_pitch)
             cur_r_deg = math.degrees(node.current_roll)
+            trim_str = f"T:{math.degrees(node.pitch_trim):+.2f}°|" if abs(node.pitch_trim) > 1e-3 else ""
+            vel_str = f"Vy:{node.vel_y:+4.1f}m/s|" if node.has_odom else ""
 
             sys.stdout.write(
                 f"\r[{pid_tag}|{imu_tag}] GAZ:{node.actual_throttle:4.0f}/{node.target_throttle:4.0f} | "
-                f"Açı: P:{cur_p_deg:+4.1f}° R:{cur_r_deg:+4.1f}° | "
-                f"M:[{m0:.0f}, {m1:.0f}, {m2:.0f}, {m3:.0f}] | {status_msg:<32}"
+                f"{vel_str}Açı:{trim_str}P:{cur_p_deg:+4.1f}° R:{cur_r_deg:+4.1f}° | "
+                f"M:[{m0:.0f}, {m1:.0f}, {m2:.0f}, {m3:.0f}] | {status_msg:<28}"
             )
             sys.stdout.flush()
 

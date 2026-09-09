@@ -33,6 +33,17 @@
     <topic>/cmd_vel</topic>
   </plugin>
 
+  <!-- 3D Flight Odometry Publisher for Position Hold & Velocity Braking -->
+  <plugin
+    filename="gz-sim-odometry-publisher-system"
+    name="gz::sim::systems::OdometryPublisher">
+    <odom_frame>world</odom_frame>
+    <robot_base_frame>base_link</robot_base_frame>
+    <dimensions>3</dimensions>
+    <odom_publish_frequency>50</odom_publish_frequency>
+    <odom_topic>/odom</odom_topic>
+  </plugin>
+
   <!-- Joint Position Controllers for Folding Mechanism -->
   <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
     <joint_name>sol_on_ground_mode</joint_name>
