@@ -13,23 +13,42 @@ install(DIRECTORY launch/
   DESTINATION share/${PROJECT_NAME}/launch
 )
 
+# Install scripts directory
+install(DIRECTORY scripts/
+  DESTINATION share/${PROJECT_NAME}/scripts
+)
+
 # Install executable scripts for ros2 run
 install(PROGRAMS
-  launch/katla.py
-  launch/mode.py
+  scripts/flight_teleop.py
+  scripts/katla.py
+  scripts/mode.py
+  scripts/circle.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
 install(PROGRAMS
-  launch/katla.py
+  scripts/flight_teleop.py
+  DESTINATION lib/${PROJECT_NAME}
+  RENAME flight_teleop
+)
+
+install(PROGRAMS
+  scripts/katla.py
   DESTINATION lib/${PROJECT_NAME}
   RENAME katla
 )
 
 install(PROGRAMS
-  launch/mode.py
+  scripts/mode.py
   DESTINATION lib/${PROJECT_NAME}
   RENAME mode
+)
+
+install(PROGRAMS
+  scripts/circle.py
+  DESTINATION lib/${PROJECT_NAME}
+  RENAME circle
 )
 
 # Install URDF/xacro files
