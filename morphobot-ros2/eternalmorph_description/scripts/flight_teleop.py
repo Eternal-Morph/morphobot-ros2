@@ -44,7 +44,8 @@ HELP_MSG = """
 
 [DİĞER]
   P              : PID Dengeleyiciyi Aç / Kapat
-  M              : Kolları Otomatik HAVA MODUNA (Air Mode) Al
+  M              : 🦿 Kolları KARA MODUNA (Ground Mode) Al
+  N              : ✈️  Kolları HAVA MODUNA (Air Mode) Al
   Q              : Çıkış ve Motorları Güvenli Kapat
 ====================================================================
 """
@@ -58,6 +59,17 @@ AIR_MODE_TARGETS = {
     'sol_arka_air_mode': 1.5708,
     'sag_arka_ground_mode': 1.5708,
     'sag_arka_air_mode': -1.5708
+}
+
+GROUND_MODE_TARGETS = {
+    'sol_on_ground_mode': 1.5708,
+    'sol_on_air_mode': 0.0,
+    'sag_on_ground_mode': -1.5708,
+    'sag_on_air_mode': 0.0,
+    'sol_arka_ground_mode': -1.5708,
+    'sol_arka_air_mode': 0.0,
+    'sag_arka_ground_mode': 1.5708,
+    'sag_arka_air_mode': 0.0
 }
 
 
@@ -197,6 +209,12 @@ class FlightPIDTeleop(Node):
     def trigger_air_mode(self):
         msg = Float64()
         for joint, pos in AIR_MODE_TARGETS.items():
+            msg.data = float(pos)
+            self.arm_pubs[joint].publish(msg)
+
+    def trigger_ground_mode(self):
+        msg = Float64()
+        for joint, pos in GROUND_MODE_TARGETS.items():
             msg.data = float(pos)
             self.arm_pubs[joint].publish(msg)
 
@@ -511,6 +529,9 @@ def main():
                     state = "AÇIK" if node.pid_enabled else "KAPALI"
                     status_msg = f"PID Dengeleyici: {state}"
                 elif key in ['m', 'M']:
+                    node.trigger_ground_mode()
+                    status_msg = "🦿 Kollar KARA MODUNA alındı!"
+                elif key in ['n', 'N']:
                     node.trigger_air_mode()
                     status_msg = "✈️ Kollar HAVA MODUNA ayarlandı!"
                 elif key in ['q', 'Q', '\x03']:

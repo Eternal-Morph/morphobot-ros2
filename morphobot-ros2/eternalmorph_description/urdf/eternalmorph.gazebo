@@ -16,23 +16,6 @@
     name="gz::sim::systems::Imu">
   </plugin>
 
-  <!-- Diff Drive / Skid Steer Control Plugin -->
-  <plugin
-    filename="gz-sim-diff-drive-system"
-    name="gz::sim::systems::DiffDrive">
-    <left_joint>sol_on_teker</left_joint>
-    <left_joint>sol_arka_teker</left_joint>
-    <right_joint>sag_on_teker</right_joint>
-    <right_joint>sag_arka_teker</right_joint>
-    <wheel_separation>0.254</wheel_separation>
-    <wheel_radius>0.0795</wheel_radius>
-    <odom_publish_frequency>30</odom_publish_frequency>
-    <max_wheel_torque>50</max_wheel_torque>
-    <max_linear_acceleration>2.0</max_linear_acceleration>
-    <max_angular_acceleration>4.0</max_angular_acceleration>
-    <topic>/cmd_vel</topic>
-  </plugin>
-
   <!-- 3D Flight Odometry Publisher for Position Hold & Velocity Braking -->
   <plugin
     filename="gz-sim-odometry-publisher-system"
@@ -290,45 +273,45 @@
 
 <gazebo reference="sol_on_teker_1">
   <material>${body_color}</material>
-  <mu1>0.35</mu1>
-  <mu2>0.35</mu2>
-  <kp>100000.0</kp>
-  <kd>2000.0</kd>
-  <minDepth>0.00005</minDepth>
-  <maxVel>0.0</maxVel>
+  <mu1>0.7</mu1>
+  <mu2>0.25</mu2>
+  <fdir1>0 1 0</fdir1>
+  <kp>10000000.0</kp>
+  <kd>1.0</kd>
+  <minDepth>0.001</minDepth>
   <selfCollide>false</selfCollide>
 </gazebo>
 
 <gazebo reference="sol_arka_teker_1">
   <material>${body_color}</material>
-  <mu1>0.35</mu1>
-  <mu2>0.35</mu2>
-  <kp>100000.0</kp>
-  <kd>2000.0</kd>
-  <minDepth>0.00005</minDepth>
-  <maxVel>0.0</maxVel>
+  <mu1>0.7</mu1>
+  <mu2>0.25</mu2>
+  <fdir1>0 1 0</fdir1>
+  <kp>10000000.0</kp>
+  <kd>1.0</kd>
+  <minDepth>0.001</minDepth>
   <selfCollide>false</selfCollide>
 </gazebo>
 
 <gazebo reference="sag_on_teker_1">
   <material>${body_color}</material>
-  <mu1>0.35</mu1>
-  <mu2>0.35</mu2>
-  <kp>100000.0</kp>
-  <kd>2000.0</kd>
-  <minDepth>0.00005</minDepth>
-  <maxVel>0.0</maxVel>
+  <mu1>0.7</mu1>
+  <mu2>0.25</mu2>
+  <fdir1>0 1 0</fdir1>
+  <kp>10000000.0</kp>
+  <kd>1.0</kd>
+  <minDepth>0.001</minDepth>
   <selfCollide>false</selfCollide>
 </gazebo>
 
 <gazebo reference="sag_arka_teker_1">
   <material>${body_color}</material>
-  <mu1>0.35</mu1>
-  <mu2>0.35</mu2>
-  <kp>100000.0</kp>
-  <kd>2000.0</kd>
-  <minDepth>0.00005</minDepth>
-  <maxVel>0.0</maxVel>
+  <mu1>0.7</mu1>
+  <mu2>0.25</mu2>
+  <fdir1>0 1 0</fdir1>
+  <kp>10000000.0</kp>
+  <kd>1.0</kd>
+  <minDepth>0.001</minDepth>
   <selfCollide>false</selfCollide>
 </gazebo>
 

@@ -21,16 +21,30 @@ install(DIRECTORY scripts/
 # Install executable scripts for ros2 run
 install(PROGRAMS
   scripts/flight_teleop.py
+  scripts/ground_teleop.py
   scripts/katla.py
   scripts/mode.py
   scripts/circle.py
+  scripts/ground_auto_test.py
   DESTINATION lib/${PROJECT_NAME}
+)
+
+install(PROGRAMS
+  scripts/ground_auto_test.py
+  DESTINATION lib/${PROJECT_NAME}
+  RENAME ground_auto_test
 )
 
 install(PROGRAMS
   scripts/flight_teleop.py
   DESTINATION lib/${PROJECT_NAME}
   RENAME flight_teleop
+)
+
+install(PROGRAMS
+  scripts/ground_teleop.py
+  DESTINATION lib/${PROJECT_NAME}
+  RENAME ground_teleop
 )
 
 install(PROGRAMS
@@ -64,6 +78,16 @@ install(DIRECTORY meshes/
 # Install world files
 install(DIRECTORY worlds/
   DESTINATION share/${PROJECT_NAME}/worlds
+)
+
+# Install config files
+install(DIRECTORY config/
+  DESTINATION share/${PROJECT_NAME}/config
+)
+
+# Install launch files
+install(DIRECTORY launch/
+  DESTINATION share/${PROJECT_NAME}/launch
 )
 
 ament_package()

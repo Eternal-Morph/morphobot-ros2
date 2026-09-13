@@ -1,0 +1,54 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100 # Hz
+    use_sim_time: true
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    diff_drive_controller:
+      type: diff_drive_controller/DiffDriveController
+
+joint_state_broadcaster:
+  ros__parameters:
+    use_sim_time: true
+
+diff_drive_controller:
+  ros__parameters:
+    use_sim_time: true
+    use_stamped_vel: false
+
+    left_wheel_names: ["sol_on_teker", "sol_arka_teker"]
+    right_wheel_names: ["sag_on_teker", "sag_arka_teker"]
+
+    wheel_separation: 0.48
+    wheel_radius: 0.0795
+
+    # Skid-steer katsayisi
+    wheel_separation_multiplier: 1.0
+    left_wheel_radius_multiplier: 1.0
+    right_wheel_radius_multiplier: 1.0
+
+    publish_rate: 50.0
+    odom_frame_id: odom
+    base_frame_id: base_link
+
+    open_loop: false
+    enable_odom_tf: false
+
+    cmd_vel_timeout: 0.5
+    publish_limited_velocity: true
+    velocity_rolling_window_size: 10
+
+    linear:
+      x:
+        max_velocity: 1.4
+        min_velocity: -1.4
+        max_acceleration: 2.5
+        max_deceleration: -3.0
+    angular:
+      z:
+        max_velocity: 1.2
+        min_velocity: -1.2
+        max_acceleration: 2.0
+        max_deceleration: -2.5
