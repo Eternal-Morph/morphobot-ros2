@@ -31,11 +31,11 @@
   <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
     <joint_name>sol_on_ground_mode</joint_name>
     <topic>/eternalmorph/sol_on_ground_mode/cmd_pos</topic>
-    <p_gain>150.0</p_gain>
-    <i_gain>0.1</i_gain>
-    <d_gain>8.0</d_gain>
-    <cmd_max>60.0</cmd_max>
-    <cmd_min>-60.0</cmd_min>
+    <p_gain>220.0</p_gain>
+    <i_gain>0.5</i_gain>
+    <d_gain>12.0</d_gain>
+    <cmd_max>120.0</cmd_max>
+    <cmd_min>-120.0</cmd_min>
   </plugin>
   <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
     <joint_name>sol_on_air_mode</joint_name>
@@ -49,11 +49,11 @@
   <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
     <joint_name>sag_on_ground_mode</joint_name>
     <topic>/eternalmorph/sag_on_ground_mode/cmd_pos</topic>
-    <p_gain>150.0</p_gain>
-    <i_gain>0.1</i_gain>
-    <d_gain>8.0</d_gain>
-    <cmd_max>60.0</cmd_max>
-    <cmd_min>-60.0</cmd_min>
+    <p_gain>220.0</p_gain>
+    <i_gain>0.5</i_gain>
+    <d_gain>12.0</d_gain>
+    <cmd_max>120.0</cmd_max>
+    <cmd_min>-120.0</cmd_min>
   </plugin>
   <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
     <joint_name>sag_on_air_mode</joint_name>
@@ -67,11 +67,11 @@
   <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
     <joint_name>sol_arka_ground_mode</joint_name>
     <topic>/eternalmorph/sol_arka_ground_mode/cmd_pos</topic>
-    <p_gain>150.0</p_gain>
-    <i_gain>0.1</i_gain>
-    <d_gain>8.0</d_gain>
-    <cmd_max>60.0</cmd_max>
-    <cmd_min>-60.0</cmd_min>
+    <p_gain>220.0</p_gain>
+    <i_gain>0.5</i_gain>
+    <d_gain>12.0</d_gain>
+    <cmd_max>120.0</cmd_max>
+    <cmd_min>-120.0</cmd_min>
   </plugin>
   <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
     <joint_name>sol_arka_air_mode</joint_name>
@@ -85,11 +85,11 @@
   <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
     <joint_name>sag_arka_ground_mode</joint_name>
     <topic>/eternalmorph/sag_arka_ground_mode/cmd_pos</topic>
-    <p_gain>150.0</p_gain>
-    <i_gain>0.1</i_gain>
-    <d_gain>8.0</d_gain>
-    <cmd_max>60.0</cmd_max>
-    <cmd_min>-60.0</cmd_min>
+    <p_gain>220.0</p_gain>
+    <i_gain>0.5</i_gain>
+    <d_gain>12.0</d_gain>
+    <cmd_max>120.0</cmd_max>
+    <cmd_min>-120.0</cmd_min>
   </plugin>
   <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
     <joint_name>sag_arka_air_mode</joint_name>
@@ -273,8 +273,8 @@
 
 <gazebo reference="sol_on_teker_1">
   <material>${body_color}</material>
-  <mu1>0.7</mu1>
-  <mu2>0.25</mu2>
+  <mu1>0.5</mu1>
+  <mu2>0.15</mu2>
   <fdir1>0 1 0</fdir1>
   <kp>10000000.0</kp>
   <kd>1.0</kd>
@@ -284,8 +284,8 @@
 
 <gazebo reference="sol_arka_teker_1">
   <material>${body_color}</material>
-  <mu1>0.7</mu1>
-  <mu2>0.25</mu2>
+  <mu1>0.5</mu1>
+  <mu2>0.15</mu2>
   <fdir1>0 1 0</fdir1>
   <kp>10000000.0</kp>
   <kd>1.0</kd>
@@ -295,8 +295,8 @@
 
 <gazebo reference="sag_on_teker_1">
   <material>${body_color}</material>
-  <mu1>0.7</mu1>
-  <mu2>0.25</mu2>
+  <mu1>0.5</mu1>
+  <mu2>0.15</mu2>
   <fdir1>0 1 0</fdir1>
   <kp>10000000.0</kp>
   <kd>1.0</kd>
@@ -306,8 +306,8 @@
 
 <gazebo reference="sag_arka_teker_1">
   <material>${body_color}</material>
-  <mu1>0.7</mu1>
-  <mu2>0.25</mu2>
+  <mu1>0.5</mu1>
+  <mu2>0.15</mu2>
   <fdir1>0 1 0</fdir1>
   <kp>10000000.0</kp>
   <kd>1.0</kd>
